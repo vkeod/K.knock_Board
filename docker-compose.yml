@@ -1,0 +1,53 @@
+services:
+  web:
+    build: .
+    container_name: knock-board-web
+    ports:
+      - "8082:80"
+    environment:
+      DB_HOST: db
+      DB_NAME: ${DB_NAME:-board_app}
+      DB_USER: ${DB_USER:-board_user}
+      DB_PASS: ${DB_PASS:?Set DB_PASS in .env}
+      UPLOAD_DIR: /var/www/uploads
+      APP_ALLOWED_HOSTS: ${APP_ALLOWED_HOSTS:-localhost:8082,127.0.0.1:8082,[::1]:8082}
+      APP_SECRET: ${APP_SECRET:?Set APP_SECRET in .env}
+      TRUST_PROXY_HEADERS: ${TRUST_PROXY_HEADERS:-0}
+      TRUSTED_PROXY_IPS: ${TRUSTED_PROXY_IPS:-}
+    volumes:
+      - ./app:/var/www/html
+      - ./uploads:/var/www/uploads
+    depends_on:
+      - db
+
+  db:
+    image: mysql:8.0
+    container_name: knock-board-db
+    ports:
+      - "127.0.0.1:3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Set MYSQL_ROOT_PASSWORD in .env}
+      MYSQL_DATABASE: ${DB_NAME:-board_app}
+      MYSQL_USER: ${DB_USER:-board_user}
+      MYSQL_PASSWORD: ${DB_PASS:?Set DB_PASS in .env}
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+
+  phpmyadmin:
+    image: phpmyadmin:5
+    container_name: knock-board-phpmyadmin
+    profiles:
+      - tools
+    ports:
+      - "127.0.0.1:8081:80"
+    environment:
+      PMA_HOST: db
+      PMA_USER: root
+      PMA_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Set MYSQL_ROOT_PASSWORD in .env}
+    depends_on:
+      - db
+
+volumes:
+  mysql-data:

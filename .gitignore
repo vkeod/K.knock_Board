@@ -1,0 +1,8 @@
+.env
+.env.*
+!.env.example
+uploads/*
+!uploads/.htaccess
+*.log
+.DS_Store
+scripts/security_smoke.sh

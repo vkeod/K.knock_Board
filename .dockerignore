@@ -1,0 +1,9 @@
+.git
+.env
+.env.*
+!.env.example
+mysql-data
+uploads/*
+!uploads/.htaccess
+*.log
+.DS_Store

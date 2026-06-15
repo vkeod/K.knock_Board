@@ -1,0 +1,3 @@
+Options -Indexes -ExecCGI -Includes -FollowSymLinks -MultiViews
+Require all denied
+ForceType text/plain
